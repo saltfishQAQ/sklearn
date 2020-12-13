@@ -1,0 +1,173 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import LabelEncoder
+from sklearn import linear_model
+import numpy as np
+df=pd.read_csv('heightweight.csv',sep=',')
+
+le=LabelEncoder()
+df['Gender2']=le.fit_transform(df['Gender'])
+x=df[['Height','Weight']]
+y=df['Gender2']
+
+classifier=linear_model.LogisticRegression(solver='newton-cg',C=100)
+classifier.fit(x,y)
+mypred=classifier.predict(x)
+
+plt.plot(df[df.Gender=='M'].Height,df[df.Gender=='M'].Weight,color='blue',marker='o',lw=0,label='M',markersize=7)
+plt.plot(df[df.Gender=='F'].Height,df[df.Gender=='F'].Weight,color='red',marker='o',lw=0,label='F',markersize=7)
+plt.plot(df[df.Gender=='M'].Height,df[df.Gender=='M'].Weight,color='yellow',marker='^',lw=0,label='M_pred',markersize=4)
+plt.plot(df[df.Gender=='F'].Height,df[df.Gender=='F'].Weight,color='k',marker='*',lw=0,label='F_pred',markersize=4)
+
+h_m=np.linspace(df['Height'].min(),df['Height'].max(),100)
+w_m=np.linspace(df['Weight'].min(),df['Weight'].max(),100)
+h_value,w_value=np.meshgrid(h_m,w_m)
+x_value=np.array([h_value.ravel(),w_value.ravel()]).transpose()
+pred_value=classifier.predict(x_value)
+pred_value=pred_value.reshape(h_value.shape)
+plt.pcolormesh(h_value,w_value,pred_value,cmap=plt.cm.gray)
+plt.legend(loc=2)
+plt.xlabel('Height (cm)')
+plt.ylabel('Weight (kg)')
+plt.title('newton-cg')
+
+# plt.savefig('hw1116_logicreg_newton-cg.jpg', dpi=256)
+plt.show()
+
+
+
+
+
+
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import LabelEncoder
+from sklearn import linear_model
+import numpy as np
+df=pd.read_csv('heightweight.csv',sep=',')
+
+le=LabelEncoder()
+df['Gender2']=le.fit_transform(df['Gender'])
+x=df[['Height','Weight']]
+y=df['Gender2']
+
+classifier=linear_model.LogisticRegression(solver='lbfgs',C=100)
+classifier.fit(x,y)
+mypred=classifier.predict(x)
+
+plt.plot(df[df.Gender=='M'].Height,df[df.Gender=='M'].Weight,color='blue',marker='o',lw=0,label='M',markersize=7)
+plt.plot(df[df.Gender=='F'].Height,df[df.Gender=='F'].Weight,color='red',marker='o',lw=0,label='F',markersize=7)
+plt.plot(df[df.Gender=='M'].Height,df[df.Gender=='M'].Weight,color='yellow',marker='^',lw=0,label='M_pred',markersize=4)
+plt.plot(df[df.Gender=='F'].Height,df[df.Gender=='F'].Weight,color='k',marker='*',lw=0,label='F_pred',markersize=4)
+
+h_m=np.linspace(df['Height'].min(),df['Height'].max(),100)
+w_m=np.linspace(df['Weight'].min(),df['Weight'].max(),100)
+h_value,w_value=np.meshgrid(h_m,w_m)
+x_value=np.array([h_value.ravel(),w_value.ravel()]).transpose()
+pred_value=classifier.predict(x_value)
+pred_value=pred_value.reshape(h_value.shape)
+plt.pcolormesh(h_value,w_value,pred_value,cmap=plt.cm.gray)
+plt.legend(loc=2)
+plt.xlabel('Height (cm)')
+plt.ylabel('Weight (kg)')
+plt.title('lbfgs')
+
+# plt.savefig('hw1123_logicreg_lbfgs.jpg', dpi=256)
+plt.show()
+
+
+
+
+
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import LabelEncoder
+from sklearn import linear_model
+import numpy as np
+df=pd.read_csv('heightweight.csv',sep=',')
+
+le=LabelEncoder()
+df['Gender2']=le.fit_transform(df['Gender'])
+x=df[['Height','Weight']]
+y=df['Gender2']
+fig = plt.figure(figsize=(8,6))
+fig.subplots_adjust(hspace=0.4, wspace=0.4)
+lis1 = [0.001, 0.1, 1, 10]
+for i in range(4):
+    classifier=linear_model.LogisticRegression(solver='liblinear',C=100,tol=lis1[i])
+    classifier.fit(x,y)
+    mypred=classifier.predict(x)
+    ax0 = plt.subplot(2,2,i+1)
+    plt.plot(df[df.Gender=='M'].Height,df[df.Gender=='M'].Weight,color='blue',marker='o',lw=0,label='M',markersize=7)
+    plt.plot(df[df.Gender=='F'].Height,df[df.Gender=='F'].Weight,color='red',marker='o',lw=0,label='F',markersize=7)
+    plt.plot(df[df.Gender == 'M'].Height, df[df.Gender == 'M'].Weight, color='yellow', marker='^', lw=0, label='M_pred',markersize=4)
+    plt.plot(df[df.Gender == 'F'].Height, df[df.Gender == 'F'].Weight, color='k', marker='*', lw=0, label='F_pred',markersize=4)
+
+    h_m=np.linspace(df['Height'].min(),df['Height'].max(),100)
+    w_m=np.linspace(df['Weight'].min(),df['Weight'].max(),100)
+    h_value,w_value=np.meshgrid(h_m,w_m)
+    x_value=np.array([h_value.ravel(),w_value.ravel()]).transpose()
+    pred_value=classifier.predict(x_value)
+    pred_value=pred_value.reshape(h_value.shape)
+    plt.pcolormesh(h_value,w_value,pred_value,cmap=plt.cm.gray)
+    plt.legend(loc=2)
+    plt.xlabel('Height (cm)')
+    plt.ylabel('Weight (kg)')
+    plt.title('tol={0}'.format(lis1[i]))
+# plt.savefig('hw1123_logicreg_contrast.jpg',dpi=256)
+plt.show()
+
+
+
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn import linear_model
+from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import minmax_scale
+
+
+df = pd.read_csv('heightweight.csv',sep=",")
+df['Height'] = df['Height'].astype(float)
+df['Weight'] = df['Weight'].astype(float)
+
+le = LabelEncoder()
+df['Gender2'] = le.fit_transform(df['Gender'])
+x = minmax_scale(df[['Height', 'Weight']])
+y = minmax_scale(df['Gender2'])
+# xm = minmax_scale(df[df.Gender=='M'].Height)
+# ym = minmax_scale(df[df.Gender=='M'].Weight)
+# xf = minmax_scale(df[df.Gender=='F'].Height)
+# yf = minmax_scale(df[df.Gender=='F'].Weight)
+
+classifier = linear_model.LogisticRegression(solver='liblinear', C=100)
+classifier.fit(x, y)
+mypred = classifier.predict(x)
+# print(x[mypred==0][:])
+# print(x[mypred==0][:,0])
+# print(x[mypred==0][:,1])
+# plt.xlim(0, 40)
+# plt.ylim(0, 180)
+
+plt.plot(df[df.Gender=='M'].Height,df[df.Gender=='M'].Weight,color='blue',marker='o',lw=0,label='M',markersize=7)
+plt.plot(df[df.Gender=='F'].Height,df[df.Gender=='F'].Weight,color='red',marker='o',lw=0,label='F',markersize=7)
+plt.plot(df[df.Gender=='M'].Height,df[df.Gender=='M'].Weight,color='yellow',marker='^',lw=0,label='M_pred',markersize=4)
+plt.plot(df[df.Gender=='F'].Height,df[df.Gender=='F'].Weight,color='k',marker='*',lw=0,label='F_pred',markersize=4)
+# plt.plot(x[mypred==1][:,0],x[mypred==1][:,1],color='yellow',marker='^',lw=0,label='M_pred',markersize=4)
+# plt.plot(x[mypred==0][:,0],x[mypred==0][:,1],color='k',marker='*',lw=0,label='F_pred',markersize=4)
+
+h_m=np.linspace(df['Height'].min(),df['Height'].max(),100)
+w_m=np.linspace(df['Weight'].min(),df['Weight'].max(),100)
+h_value,w_value=np.meshgrid(h_m,w_m)
+x_value=np.array([h_value.ravel(),w_value.ravel()]).transpose()
+pred_value=classifier.predict(x_value)
+pred_value=pred_value.reshape(h_value.shape)
+plt.pcolormesh(h_value,w_value,pred_value,cmap=plt.cm.gray)
+plt.legend(loc=2)
+plt.xlabel('Height (cm)')
+plt.ylabel('Weight (kg)')
+plt.savefig('hw1116_logicreg_minmax.jpg',dpi=256)
+
+# plt.show()
+

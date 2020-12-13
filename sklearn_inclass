@@ -1,0 +1,199 @@
+import pandas as pd
+import numpy as np
+from sklearn import linear_model
+from sklearn.preprocessing import minmax_scale
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import PolynomialFeatures
+df=pd.read_csv('film2.txt',sep=';')
+df=df[['starttime','endtime','box']]
+df=df.dropna()
+df.starttime=pd.to_datetime(df.starttime)
+df.endtime=pd.to_datetime(df.endtime)
+df['allday']=(df.endtime-df.starttime).dt.days+1
+df.box=df.box.astype(float)
+df['meanbox']=df.box/df.allday
+df=df.reset_index(drop=True)
+x=minmax_scale(df['allday'])
+y=minmax_scale(df['meanbox'])
+list1 = [1,2,4,5]
+fig = plt.figure(figsize=(12,6))
+fig.subplots_adjust(hspace=0.4, wspace=0.4)
+for i,a in zip(range(1,5),list1):
+    ax0 = plt.subplot(2, 2, i)
+    poly=PolynomialFeatures(degree=a,order='F')
+    xt=poly.fit_transform(x.reshape(-1,1))
+    xtrain,xtest,ytrain,ytest=train_test_split(xt,y,train_size=0.8,test_size=0.2)
+    # print('len: x=%s, xt=%s, xtrain=%s, xtest=%s'%(x.shape,xt.shape,xtrain.shape,xtest.shape))
+    # print('len: y=%s, ytrain=%s, ytest=%s'%(y.shape,ytr ain.shape,ytest.shape))
+    polymodel=linear_model.LinearRegression()
+    polymodel.fit(xtrain,ytrain)
+    ypred=polymodel.predict(xtest)
+    variance=np.mean((ypred-ytest)**2)
+    xdraw=np.linspace(x.min(),x.max(),100)
+    xtdraw=poly.fit_transform(xdraw.reshape(-1,1))
+    ydraw=polymodel.predict(xtdraw)
+    plt.scatter(xtrain[:,1],ytrain,color='gray',label='train')
+    plt.scatter(xtest[:,1],ytest,color='k',label='test')
+    plt.plot(xtest[:,1],ypred,'*',color='r',linewidth=1,label='pred')
+    plt.plot(xdraw,ydraw,'-',color='r',linewidth=1,label='draw line')
+    plt.legend(loc=2)
+    plt.xlabel('day number')
+    plt.ylabel('mean box')
+    vari ='%5.3f'%variance
+    plt.title('deg = {0}, vari = {1}'.format(a,vari))
+plt.savefig('hw1116_01.jpg',dpi=256)
+plt.show()
+
+
+
+
+
+
+import pandas as pd
+from sklearn.preprocessing import minmax_scale
+from sklearn.model_selection import train_test_split
+from sklearn import linear_model
+from sklearn.preprocessing import PolynomialFeatures
+import matplotlib.pyplot as plt
+import numpy as np
+
+data = pd.read_csv("salary.csv")
+data1 = data.dropna()
+data2=data1.drop_duplicates(subset=['Year'],ignore_index=True)
+
+x=minmax_scale(data2['Year'])
+y=minmax_scale(data2['Salary'])
+fig = plt.figure(figsize=(12,6))
+fig.subplots_adjust(hspace=0.4, wspace=0.4)
+for i in range(1,5):
+    ax0 = plt.subplot(2, 2, i)
+    poly = PolynomialFeatures(degree=i, order='F')
+    xt = poly.fit_transform(x.reshape(-1, 1))
+    xtrain, xtest, ytrain, ytest = train_test_split(xt, y, train_size=0.8, test_size=0.2)
+    # print('len: x=%s, xt=%s, xtrain=%s, xtest=%s' % (x.shape, xt.shape, xtrain.shape, xtest.shape))
+    # print('len: y=%s, ytrain=%s, ytest=%s' % (y.shape, ytrain.shape, ytest.shape))
+    polymodel = linear_model.LinearRegression()
+    polymodel.fit(xtrain, ytrain)
+    ypred = polymodel.predict(xtest)
+    variance = np.mean((ypred - ytest) ** 2)
+    xdraw = np.linspace(x.min(), x.max(), 100)
+    xtdraw = poly.fit_transform(xdraw.reshape(-1, 1))
+    ydraw = polymodel.predict(xtdraw)
+    plt.scatter(xtrain[:, 1], ytrain, color='gray', label='train')
+    plt.scatter(xtest[:, 1], ytest, color='k', label='test')
+    plt.plot(xtest[:, 1], ypred, '*', color='r', linewidth=1, label='pred')
+    plt.plot(xdraw, ydraw, '-', color='r', linewidth=1, label='draw line')
+    plt.legend(loc=2)
+    plt.xlabel('Year')
+    plt.ylabel('Salary')
+    vari = '%5.3f' % variance
+    plt.title('deg = {0}, vari = {1}'.format(i, vari))
+plt.savefig('hw1116_02.jpg', dpi=256)
+plt.show()
+
+
+
+
+
+
+"""讀取film2.txt中的'starttime','endtime','box','filmtype','score’。
+以allday上映天數(endtime- starttime)、meanbox日均票房（box/ (endtime- starttime)）、filmtype作為x，score作為y。
+切分train和test（比例8:2）
+
+模仿課上的例子，在df中加入4列分別記錄filmtype
+是否為喜剧
+是否為动作
+是否為动画
+以上皆不是
+並利用map({‘True’:’1’,’False’:’0’})轉換這2列的格式。
+以這4列以及allday,meanbox作為x，score作為y ，進行范圍縮放
+最後進行多元線性回歸擬合
+對xtest進行預測ypred1
+求出variance1=1/𝑁 ∑▒(𝑦𝑝𝑟𝑒𝑑1−𝑦𝑡𝑒𝑠𝑡)^2
+"""
+
+from sklearn.model_selection import train_test_split
+from matplotlib.pyplot import MultipleLocator
+from sklearn.preprocessing import minmax_scale
+import pandas as pd
+import numpy as np
+from sklearn import linear_model
+import matplotlib.pyplot as plt
+
+df=pd.read_csv('film2.txt',sep=';')
+df=df[['starttime','endtime','box','filmtype','score']]
+df=df.dropna()
+df.starttime=pd.to_datetime(df.starttime)
+df.endtime=pd.to_datetime(df.endtime)
+df['allday']=(df.endtime-df.starttime).dt.days+1
+df.box=df.box.astype(float)
+df['meanbox']=df.box/df.allday
+df=df.reset_index(drop=True)
+pd.set_option('display.max_columns',20)
+pd.set_option('display.max_rows',90)
+x=minmax_scale(df[['meanbox','allday']])
+y=minmax_scale(df['score'])
+xtrain, xtest, ytrain, ytest = train_test_split(x,y, train_size=0.8, test_size=0.2)
+#划分训练集和测试集
+df['iscomedy']=df['filmtype'].str.contains('喜剧').astype(str)
+df['isaction']=df['filmtype'].str.contains('动作').astype(str)
+df['iscartoon']=df['filmtype'].str.contains('动画').astype(str)
+df['isnothing']=(df['filmtype'].str.contains('喜剧|动作|动画')==False).astype(str)
+nametotype={'True':'1','False':'0'}
+df['typecomedy']=df['iscomedy'].map(nametotype)
+df['typeaction']=df['isaction'].map(nametotype)
+df['typecartoon']=df['iscartoon'].map(nametotype)
+df['typenothing']=df['isnothing'].map(nametotype)
+df=df.reset_index(drop=True)
+
+x1=minmax_scale(df[['meanbox','allday','typecomedy','typeaction','typecartoon','typenothing']])
+y1=minmax_scale(df['score'])
+xtrain1, xtest1, ytrain1, ytest1 = train_test_split(x1,y1, train_size=0.8, test_size=0.2)
+regr1=linear_model.LinearRegression()
+regr1.fit(xtrain1,ytrain1)
+ypred1=regr1.predict(xtest1)
+variance1=np.mean((ypred1-ytest1)**2)
+#第一种预测方法
+
+def filmtype_map(x):
+    if "喜剧" in x and "动作" in x and "动画" in x:
+        filmtype = 0
+    elif "动作" in x and "动画" in x:
+        filmtype = 1
+    elif "喜剧" in x and "动作" in x:
+        filmtype = 2
+    elif "喜剧" in x and "动画" in x:
+        filmtype = 3
+    elif "动画" in x:
+        filmtype = 4
+    elif "动作" in x:
+        filmtype = 5
+    else:
+        filmtype = 6
+    return filmtype
+df["filmtype"] = df["filmtype"].map(filmtype_map)
+x2=minmax_scale(df[['meanbox','allday','filmtype']])
+y2=minmax_scale(df['score'])
+xtrain2, xtest2, ytrain2, ytest2 = train_test_split(x2,y2, train_size=0.8, test_size=0.2)
+regr2=linear_model.LinearRegression()
+regr2.fit(xtrain2,ytrain2)
+ypred2=regr2.predict(xtest2)
+variance2=np.mean((ypred2-ytest2)**2)
+
+ax=plt.gca()
+vari1 = round(variance1,4)
+vari2 = round(variance2,4)
+x_major_locator=MultipleLocator(1)
+ax.xaxis.set_major_locator(x_major_locator)
+plt.plot(range(len(ytest)),ytest,'*',color='black',label='ytest')
+plt.plot(range(len(ypred1)),ypred1,'*',color='green',label='ypred1')
+plt.plot(range(len(ypred2)),ypred2,'*',color='red',label='ypred1')
+plt.legend(loc=2)
+plt.xlabel('num')
+plt.ylabel('score')
+plt.title('variance1 = {0},variance2 = {1}'.format(vari1,vari2))
+plt.savefig('hw1116_03d.jpg', dpi=256)
+# plt.show()
+
+
